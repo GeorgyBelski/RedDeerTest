@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     Vector3 newRotationAngle, previousRotationAngle;
     Vector3 deltaPosition;
     float rotationFactor;
+    float verticalInput;
     Vector3 snapPosition;
 
 
@@ -41,10 +42,10 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        verticalInput = Input.GetAxisRaw("Vertical");
         if (CheckGround())
         {
-            float v = Input.GetAxisRaw("Vertical");
-            inputAxisVector = new Vector3(0, 0, v);
+            inputAxisVector = new Vector3(0, 0, verticalInput);
             moveDirection = transform.rotation * inputAxisVector;
             rigidbody.velocity = moveDirection.normalized * moveSpeed;
         }
@@ -88,7 +89,7 @@ public class PlayerController : MonoBehaviour
     }
     bool CheckGround() 
     {
-        Vector3 front = transform.position + transform.rotation * Vector3.forward * 0.3f;
+        Vector3 front = transform.position + transform.rotation * Vector3.forward * 0.3f * Mathf.Sign(verticalInput);
         if (Physics.Raycast(front, Vector3.down, out RaycastHit hit, 1f, Globals.groundMask))
         {
             Debug.DrawLine(front, front + Vector3.down, Color.yellow);
