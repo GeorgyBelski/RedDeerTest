@@ -11,4 +11,6 @@ public class Globals : MonoBehaviour
 
     public static int weaponLayer = 10;
 
+    public static int enemyLayer = 11;
+
 }

@@ -5,11 +5,9 @@ using UnityEngine;
 public class Inventory : MonoBehaviour
 {
     
-
     public Transform rightHand;
     public List<Loot> loot = new List<Loot>();
-
-
+    public Loot currentWeapon = null;
 
     void Start()
     {
@@ -21,7 +19,6 @@ public class Inventory : MonoBehaviour
         
     }
 
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.layer == Globals.lootLayer) 
@@ -32,14 +29,17 @@ public class Inventory : MonoBehaviour
             if (newLoot) 
             { 
                 loot.Add(newLoot);
-                other.transform.parent = rightHand;
-                newLoot.PickUp(rightHand);
-                
+                if (newLoot.type == Type.Weapon) 
+                {
+                    newLoot.transform.parent = rightHand;
+                    newLoot.PickUp(rightHand);
+                    currentWeapon = newLoot;
+                    currentWeapon.DisableCollider();
+                }   
             }
             other.gameObject.layer = Globals.weaponLayer;
 
-            
-          
+             
         }
     }
 }

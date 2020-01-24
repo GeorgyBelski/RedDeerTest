@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum LootState {Idle, PickingUp, InInventory};
+public enum Type {Weapon, Bonus};
 public class Loot : MonoBehaviour
 {
     public static Dictionary<GameObject, Loot> objectLootMap = new Dictionary<GameObject, Loot>();
 
     public LootState state = LootState.Idle;
+    public Type type;
+    public new Collider collider;
     public float pickUpTime = 0.6f;
     float timerPickUpTime = 0;
 
@@ -51,4 +54,12 @@ public class Loot : MonoBehaviour
         }
     }
 
+    public void DisableCollider() 
+    {
+        collider.enabled = false;
+    }
+    public void EnableCollider() 
+    {
+        collider.enabled = true;
+    }
 }

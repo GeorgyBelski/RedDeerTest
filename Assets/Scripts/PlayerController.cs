@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     Vector3 moveDirection;
     Vector3 newRotationAngle, previousRotationAngle;
     Vector3 deltaPosition;
+    Quaternion startRotation;
     float rotationFactor;
     float verticalInput;
     Vector3 snapPosition;
@@ -25,6 +26,7 @@ public class PlayerController : MonoBehaviour
     {
         previousRotationAngle = transform.eulerAngles;
         deltaPosition = transform.position;
+        startRotation = transform.rotation;
     }
 
     void FixedUpdate()
@@ -102,6 +104,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void Restart()
+    {
+        transform.position = deltaPosition;
+        transform.rotation = startRotation;
+        previousRotationAngle = transform.eulerAngles;
+    }
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
