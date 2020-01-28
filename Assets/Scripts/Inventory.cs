@@ -23,9 +23,8 @@ public class Inventory : MonoBehaviour
     {
         if (other.gameObject.layer == Globals.lootLayer) 
         {
-            Debug.Log(other.gameObject);
-            Loot newLoot;
-            Loot.objectLootMap.TryGetValue(other.gameObject, out newLoot);
+            //Debug.Log(other.gameObject);
+            Loot.objectLootMap.TryGetValue(other.gameObject, out Loot newLoot);
             if (newLoot) 
             { 
                 loot.Add(newLoot);

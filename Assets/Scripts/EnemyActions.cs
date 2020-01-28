@@ -62,7 +62,7 @@ public class EnemyActions : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Enemy: " + other.gameObject);
+        //Debug.Log("Enemy: " + other.gameObject);
         if (other.gameObject.layer == Globals.weaponLayer)
         { ApplyDeath(); }
     }

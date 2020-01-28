@@ -40,12 +40,29 @@ public class PlayerActions : MonoBehaviour
     {
         playerController.Restart();
     }
+    public void JumpOnSpringboard()
+    {
+        animator.SetBool("PlatformJump", true);
+        playerController.state = PlayerState.Freeze;
+    }
+    public void LendingOnSpringboard()
+    {
+        animator.SetBool("PlatformJump", false);
+        playerController.isTransferEnd = true;
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.layer == Globals.enemyLayer) 
+        if (collision.gameObject.layer == Globals.enemyLayer)
         {
             Restart();
+        }
+        else if (collision.gameObject.layer == Globals.springboardLayer) 
+        {
+            playerController.SetMovingPlatform(collision.gameObject);
+
+            if (collision.transform.position.y > this.transform.position.y)
+            { JumpOnSpringboard(); }
         }
     }
 }
