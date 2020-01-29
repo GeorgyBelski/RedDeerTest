@@ -10,6 +10,8 @@ public class MovingPlatform : MonoBehaviour
     public Vector3 lookDirection = Vector3.up * 180;
     public float heightOfPlatform = 0.7f;
 
+    public Vector3 playerPosition;
+
     [Header("References")]
     public Animator animator;
     public PlayerController playerController;
@@ -17,11 +19,13 @@ public class MovingPlatform : MonoBehaviour
     void Start()
     {
         objectMovingPlatformMap.Add(platform.gameObject, this);
+
     }
 
     void Update()
     {
-        
+       /* if (playerController)
+        { playerPosition = playerController.transform.position; }*/
     }
 
     public void SpringCharging() 
@@ -32,6 +36,7 @@ public class MovingPlatform : MonoBehaviour
     public void Launch() 
     {
         playerController.SpringLaunch(lookDirection);
+        //playerController = null;
     }
     public void EndSpringJump()
     {

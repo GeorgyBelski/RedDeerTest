@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 3f;
     public float rotationTime = 0.3f;
-    public PlayerState state = PlayerState.Move;
+    [SerializeField] PlayerState state = PlayerState.Move;
     public bool isTransferEnd = false;
     public float takingOffTime = 0.7f;
     float timerTakingOff;
@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
     float verticalInput;
     Vector3 snapPosition;
     ConstraintSource constraintSource = new ConstraintSource();
-    int transferEndframeOffset = 0;
+    //int transferEndframeOffset = 0;
     Vector3 lookDirection;
     
 
@@ -62,6 +62,8 @@ public class PlayerController : MonoBehaviour
         TakingOff();
         GoingDown();
     }
+
+    public void SetState(PlayerState newState) { state = newState; }
     void Move()
     {
         if (state != PlayerState.Move)
@@ -125,7 +127,7 @@ public class PlayerController : MonoBehaviour
         }
     } 
 
-    void DefineSnap( float snappingTime, PlayerState finalState = PlayerState.Move)
+    public void DefineSnap( float snappingTime, PlayerState finalState = PlayerState.Move)
     {
         isSnapping = true;
         this.snappingTime = snappingTime;
@@ -163,10 +165,20 @@ public class PlayerController : MonoBehaviour
     }
     public void TakeOffToSpringboard() // Call from animation "JumpOnPlatform"
     {
+        /*  previousPosition = transform.position;
+          newPosition = previousPosition + movingPlatform.heightOfPlatform * Vector3.up + transform.rotation * Vector3.forward;
+          timerTakingOff = 0;
+          takingOffTime = 0.12f;
+          state = PlayerState.TakeOff;*/
+
+        SetTakeOff(movingPlatform.heightOfPlatform, 0.12f);
+    }
+    public void SetTakeOff(float height, float time) 
+    {
         previousPosition = transform.position;
-        newPosition = previousPosition + movingPlatform.heightOfPlatform * Vector3.up + transform.rotation * Vector3.forward;
+        newPosition = previousPosition + height * Vector3.up + transform.rotation * Vector3.forward * Mathf.Sign(verticalInput);
         timerTakingOff = 0;
-        takingOffTime = 0.12f;
+        takingOffTime = time;
         state = PlayerState.TakeOff;
     }
     public void EnabletMovingPlatformConstraint(MovingPlatform movingPlatform)
@@ -188,31 +200,18 @@ public class PlayerController : MonoBehaviour
 
     public void LendedOnPlatform()
     {
-      /*  if (isTransferEnd && transferEndframeOffset > 0)
-        { transferEndframeOffset--; }
-        else if (isTransferEnd)
-        {*/
-         //   ReconcileTransforms();
-            //Debug.Log(movingPlatform);
-            if (movingPlatform)
-            {
-                EnabletMovingPlatformConstraint(movingPlatform);
-            }
-           // isTransferEnd = false;
-           // transferEndframeOffset = 0;
-       // }
+        if (movingPlatform)
+        { EnabletMovingPlatformConstraint(movingPlatform);}
     }
 
     public void SpringLaunch(Vector3 lookDirection)
     {
         parentConstraint.enabled = false;
+        transform.position = movingPlatform.transform.position + Vector3.up * 0.5f;
         movingPlatform = null;
         this.lookDirection = lookDirection;
-        state = PlayerState.TakeOff;
-        previousPosition = transform.position;
-        newPosition = previousPosition + Vector3.up * 1.7f + transform.rotation*Vector3.forward;
-        timerTakingOff = 0;
-        takingOffTime = 0.5f;
+        SetTakeOff(1.7f, 0.5f);
+
     }
     void TakingOff()
     {
@@ -235,7 +234,7 @@ public class PlayerController : MonoBehaviour
             {
                 //timerTakingOff = 0;
                transform.position = newPosition;
-                state = PlayerState.GoDown;
+                //state = PlayerState.GoDown;
             }
         }
     }
@@ -278,10 +277,10 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawLine(transform.position, transform.position + inputAxisVector);
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(transform.position, transform.position + transform.rotation * inputAxisVector);
-        /*
-        Gizmos.DrawSphere(previousPosition,.5f);
+        /**/
+        Gizmos.DrawSphere(previousPosition,.2f);
         Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(newPosition, .5f);
-        */
+        Gizmos.DrawSphere(newPosition, .2f);
+        
     }
 }

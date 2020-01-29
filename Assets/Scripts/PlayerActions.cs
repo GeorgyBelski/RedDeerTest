@@ -48,7 +48,8 @@ public class PlayerActions : MonoBehaviour
     public void JumpOnSpringboard()
     {
         animator.SetBool("PlatformJump", true);
-        playerController.state = PlayerState.Freeze;
+        playerController.SetState(PlayerState.Freeze);
+      //  playerController.DefineSnap(0.0f, PlayerState.Freeze);
     }
     
     public void LandedOnSpringboard()
@@ -89,11 +90,13 @@ public class PlayerActions : MonoBehaviour
     void Climb() 
     {
         animator.SetBool("Climb", true);
+        playerController.SetTakeOff(1f, 0.15f);
+      //  playerController.DefineSnap(0.1f);
     }
     public void EndClimb() 
     {
         animator.SetBool("Climb", false);
-        playerController.isTransferEnd = true;
+        playerController.SetState(PlayerState.Move);
     }
     private void OnCollisionEnter(Collision collision)
     {
@@ -121,8 +124,8 @@ public class PlayerActions : MonoBehaviour
         }
         else if (other.gameObject.layer == Globals.stairLayer) 
         {
-            Debug.Log("other : " + other.gameObject.layer);
-            other.gameObject.GetComponent<StairController>().DisableCollider();
+            Debug.Log("other : " + other.gameObject);
+            //other.gameObject.GetComponent<StairController>().DisableCollider();
             Climb();
         }
     }
