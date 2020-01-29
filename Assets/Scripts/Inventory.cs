@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,9 @@ public class Inventory : MonoBehaviour
     public Transform rightHand;
     public List<Loot> loot = new List<Loot>();
     public Loot currentWeapon = null;
+    bool isHidingWeapon = false;
+    public float hideWeaponTime = 0.5f;
+    float timerHideWeapon = 0;
 
     void Start()
     {
@@ -16,7 +20,7 @@ public class Inventory : MonoBehaviour
 
     void Update()
     {
-        
+        HidingWeapon();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -40,5 +44,31 @@ public class Inventory : MonoBehaviour
 
              
         }
+    }
+    void HidingWeapon()
+    {
+        if (isHidingWeapon && timerHideWeapon >= 0 && currentWeapon) 
+        {
+            float hideFactor = timerHideWeapon / hideWeaponTime;
+            currentWeapon.transform.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, hideFactor);
+            timerHideWeapon -= Time.deltaTime;
+        }
+    }
+    internal void HideWeapon()
+    {
+        timerHideWeapon = hideWeaponTime;
+        isHidingWeapon = true;
+    }
+
+    public void ShowWeapon()
+    {
+        timerHideWeapon = hideWeaponTime;
+        isHidingWeapon = false;
+    }
+
+    void AppearingWeapon()
+    {
+        
+
     }
 }

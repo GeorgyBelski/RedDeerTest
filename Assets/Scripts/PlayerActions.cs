@@ -7,6 +7,11 @@ public class PlayerActions : MonoBehaviour
     public Animator animator;
     public Inventory inventory;
     public PlayerController playerController;
+    public float scaleDelay = 0.2f;
+
+    bool isPipe = false;
+    float timerScaleDelay = 0;
+    
     void Start()
     {
         
@@ -14,13 +19,13 @@ public class PlayerActions : MonoBehaviour
     void Update()
     {
         Attack();
+        Squeeze();
     }
 
     void Attack() 
     {
         if ((Input.GetMouseButtonDown(0) ||Input.GetKey(KeyCode.E)) && inventory.currentWeapon) 
         {
-            //Debug.Log("Attack");
             animator.SetBool("Attack", true);
         }
     
@@ -51,6 +56,43 @@ public class PlayerActions : MonoBehaviour
         playerController.isTransferEnd = true;
     }
 
+    public void SqueezeThroughPipe() 
+    {
+        timerScaleDelay = scaleDelay;
+        isPipe = true;
+    }
+    void Squeeze() 
+    {
+        if (isPipe) 
+        {
+            if (timerScaleDelay <= 0)
+            {
+                animator.SetBool("Squeeze", true);
+                inventory.HideWeapon();
+                playerController.StartGoDown();
+                isPipe = false;
+            }
+            else 
+            {
+                timerScaleDelay -= Time.deltaTime;
+            }
+        }
+    }
+    
+    public void EndSqueeze() 
+    {
+        animator.SetBool("Squeeze", false);
+        inventory.ShowWeapon();
+    }
+    void Climb() 
+    {
+        animator.SetBool("Climb", true);
+    }
+    public void EndClimb() 
+    {
+        animator.SetBool("Climb", false);
+        playerController.isTransferEnd = true;
+    }
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.layer == Globals.enemyLayer)
@@ -63,6 +105,23 @@ public class PlayerActions : MonoBehaviour
 
             if (collision.transform.position.y > this.transform.position.y)
             { JumpOnSpringboard(); }
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.layer == Globals.pipeLayer)
+        {
+            SqueeezeAttributes squeeezeAttributes = other.GetComponent<SqueeezeAttributes>();
+            squeeezeAttributes.EnableNextTriggers();
+            playerController.pipeDestination = squeeezeAttributes.destination;
+            SqueezeThroughPipe();
+        }
+        else if (other.gameObject.layer == Globals.stairLayer) 
+        {
+            Debug.Log("other : " + other.gameObject.layer);
+            other.gameObject.GetComponent<StairController>().DisableCollider();
+            Climb();
         }
     }
 }

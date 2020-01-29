@@ -83,10 +83,15 @@ MonoBehaviour:
   moveSpeed: 3
   rotationTime: 0.3
   state: 0
+  isTransferEnd: 0
+  takingOffTime: 0.5
+  playerActions: {fileID: 991161410879429202}
   rigidbody: {fileID: 3042057192701133432}
   playerGeometry: {fileID: 7395430610291731039}
   movingPlatform: {fileID: 0}
   parentConstraint: {fileID: 511466733}
+  pipeDestination: {x: 0, y: 0, z: 0}
+  goDownTime: 0.6
 --- !u!114 &3652957295429749053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -102,6 +107,7 @@ MonoBehaviour:
   rightHand: {fileID: 7230459764448848844}
   loot: []
   currentWeapon: {fileID: 0}
+  hideWeaponTime: 0.5
 --- !u!114 &991161410879429202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,9 +160,9 @@ ParentConstraint:
   m_AffectTranslationX: 1
   m_AffectTranslationY: 1
   m_AffectTranslationZ: 1
-  m_AffectRotationX: 1
-  m_AffectRotationY: 1
-  m_AffectRotationZ: 1
+  m_AffectRotationX: 0
+  m_AffectRotationY: 0
+  m_AffectRotationZ: 0
   m_IsContraintActive: 1
   m_IsLocked: 0
   m_Sources:
@@ -438,7 +444,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.81, y: 0.99, z: 0.82}
+  m_Size: {x: 0.57, y: 0.99, z: 0.7}
   m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!1 &4158040843209147546
 GameObject:

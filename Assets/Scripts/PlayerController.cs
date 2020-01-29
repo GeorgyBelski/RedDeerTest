@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 
-public enum PlayerState {Move, Rotate, Freeze, TakeOff};
+public enum PlayerState {Move, Rotate, Freeze, TakeOff, GoDown };
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 3f;
@@ -15,15 +15,19 @@ public class PlayerController : MonoBehaviour
     float timerTakingOff;
 
     [Header("References")]
+    public PlayerActions playerActions;
     public new Rigidbody rigidbody;
     public Transform playerGeometry;
     public MovingPlatform movingPlatform = null;
     public ParentConstraint parentConstraint;
+    public Vector3 pipeDestination;
+    public float goDownTime = 0.6f;
+    float timerGoDown;
 
     Vector3 inputAxisVector;
     Vector3 moveDirection;
     Vector3 newRotationAngle, previousRotationAngle;
-    public Vector3 newPosition, previousPosition;
+    Vector3 newPosition, previousPosition;
     Vector3 deltaPosition;
 
     Quaternion startRotation;
@@ -31,9 +35,9 @@ public class PlayerController : MonoBehaviour
     float verticalInput;
     Vector3 snapPosition;
     ConstraintSource constraintSource = new ConstraintSource();
-    int transferEndframeOffset = 1;
+    int transferEndframeOffset = 0;
     Vector3 lookDirection;
-
+    
 
     void Start()
     {
@@ -51,6 +55,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         TakingOff();
+        GoingDown();
     }
     void Move()
     {
@@ -66,12 +71,14 @@ public class PlayerController : MonoBehaviour
             inputAxisVector = new Vector3(0, 0, verticalInput);
             moveDirection = transform.rotation * inputAxisVector;
             rigidbody.velocity = moveDirection.normalized * moveSpeed;
+          //  transform.position += moveDirection.normalized * moveSpeed * Time.deltaTime;
         }
         else
         {
             rigidbody.velocity = Vector3.zero;
         }
     }
+
     void Rotate()
     {
         if (state != PlayerState.Move && state != PlayerState.Rotate)
@@ -154,7 +161,7 @@ public class PlayerController : MonoBehaviour
         else if (isTransferEnd)
         {
             ReconcileTransforms();
-            Debug.Log(movingPlatform);
+            //Debug.Log(movingPlatform);
             if (movingPlatform)
             {
                 EnabletMovingPlatformConstraint(movingPlatform);
@@ -162,7 +169,7 @@ public class PlayerController : MonoBehaviour
                 movingPlatform.SpringCharging();
             }
             isTransferEnd = false;
-            transferEndframeOffset = 1;
+            transferEndframeOffset = 0;
         }
     }
 
@@ -182,9 +189,6 @@ public class PlayerController : MonoBehaviour
     {
         if (state == PlayerState.TakeOff) 
         {
-            //rotationFactor += Time.deltaTime / rotationTime;
-            //transform.rotation = Quaternion.Slerp(Quaternion.Euler(previousRotationAngle), Quaternion.Euler(newRotationAngle), rotationFactor);
-            
             timerTakingOff += Time.deltaTime;
             float takeOffFactor = timerTakingOff / takingOffTime * Mathf.PI * 0.5f;
             float right=0, up, forward=0;
@@ -202,6 +206,32 @@ public class PlayerController : MonoBehaviour
             {
                 //timerTakingOff = 0;
                transform.position = newPosition;
+                state = PlayerState.GoDown;
+            }
+        }
+    }
+    public void StartGoDown()
+    {
+        state = PlayerState.GoDown;
+        timerGoDown = goDownTime;
+        previousPosition = transform.position;
+        newPosition = pipeDestination;
+    }
+    void GoingDown() 
+    {
+        if (state == PlayerState.GoDown)
+        {
+            if (timerGoDown >= 0)
+            {
+                float goDownFactor = timerGoDown / goDownTime * Mathf.PI * 0.5f;
+                transform.position = Vector3.Lerp(newPosition, previousPosition, Mathf.Sin(goDownFactor));
+                timerGoDown -= Time.deltaTime;
+            }
+            else 
+            {
+                transform.position = newPosition;
+                state = PlayerState.Move;
+                playerActions.EndSqueeze();
             }
         }
     }
@@ -219,9 +249,10 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawLine(transform.position, transform.position + inputAxisVector);
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(transform.position, transform.position + transform.rotation * inputAxisVector);
-
+        /*
         Gizmos.DrawSphere(previousPosition,.5f);
         Gizmos.color = Color.yellow;
         Gizmos.DrawSphere(newPosition, .5f);
+        */
     }
 }
