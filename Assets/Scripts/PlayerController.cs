@@ -20,18 +20,22 @@ public class PlayerController : MonoBehaviour
     public Transform playerGeometry;
     public MovingPlatform movingPlatform = null;
     public ParentConstraint parentConstraint;
+    [HideInInspector]
     public Vector3 pipeDestination;
     public float goDownTime = 0.6f;
     float timerGoDown;
 
     Vector3 inputAxisVector;
     Vector3 moveDirection;
-    Vector3 newRotationAngle, previousRotationAngle;
-    Vector3 newPosition, previousPosition;
+    public Vector3 newRotationAngle, previousRotationAngle;
+    public Vector3 newPosition, previousPosition;
     Vector3 deltaPosition;
 
     Quaternion startRotation;
     float rotationFactor;
+    bool isSnapping;
+    float snappingFactor ,snappingTime;
+    PlayerState snapFinalstate;
     float verticalInput;
     Vector3 snapPosition;
     ConstraintSource constraintSource = new ConstraintSource();
@@ -50,7 +54,8 @@ public class PlayerController : MonoBehaviour
     {
         Move();
         Rotate();
-        TransferEnd();
+        Snaping();
+      //  TransferEnd();
     }
     void Update()
     {
@@ -90,25 +95,42 @@ public class PlayerController : MonoBehaviour
             state = PlayerState.Rotate;
             newRotationAngle = transform.eulerAngles + new Vector3(0, Mathf.Sign(h) * 90, 0);
             rotationFactor = 0;
-            DefineSnap();
+            DefineSnap(rotationTime, PlayerState.Rotate);
         }
         else if (state == PlayerState.Rotate)
         {
             rotationFactor += Time.deltaTime / rotationTime;
             transform.rotation = Quaternion.Slerp(Quaternion.Euler(previousRotationAngle), Quaternion.Euler(newRotationAngle), rotationFactor);
-            transform.position = Vector3.Lerp(transform.position, snapPosition, rotationFactor);
+        //    transform.position = Vector3.Lerp(transform.position, snapPosition, rotationFactor);
             if (rotationFactor >= 1)
             {
                 transform.eulerAngles = newRotationAngle;
                 previousRotationAngle = newRotationAngle;
-                transform.position = snapPosition;
+             //   transform.position = snapPosition;
                 state = PlayerState.Move;
             }
         }
     }
-
-    void DefineSnap()
+    public void Snaping() 
     {
+        if (!isSnapping) { return; }
+
+        snappingFactor += Time.deltaTime / rotationTime;
+        transform.position = Vector3.Lerp(transform.position, snapPosition, snappingFactor);
+        if (snappingFactor >= 1)
+        {
+            transform.position = snapPosition;
+            state = snapFinalstate;
+            isSnapping = false;
+        }
+    } 
+
+    void DefineSnap( float snappingTime, PlayerState finalState = PlayerState.Move)
+    {
+        isSnapping = true;
+        this.snappingTime = snappingTime;
+        snapFinalstate = finalState;
+        snappingFactor = 0;
         float snapX = Mathf.Round(transform.position.x - deltaPosition.x) + deltaPosition.x;
         float snapZ = Mathf.Round(transform.position.z - deltaPosition.z) + deltaPosition.z;
         float snapY = transform.position.y;
@@ -128,6 +150,7 @@ public class PlayerController : MonoBehaviour
             return false;
         }
     }
+
     public void ReconcileTransforms()
     {
         this.transform.position = playerGeometry.position;
@@ -138,9 +161,18 @@ public class PlayerController : MonoBehaviour
     {
         MovingPlatform.objectMovingPlatformMap.TryGetValue(platform.gameObject, out movingPlatform);
     }
+    public void TakeOffToSpringboard() // Call from animation "JumpOnPlatform"
+    {
+        previousPosition = transform.position;
+        newPosition = previousPosition + movingPlatform.heightOfPlatform * Vector3.up + transform.rotation * Vector3.forward;
+        timerTakingOff = 0;
+        takingOffTime = 0.12f;
+        state = PlayerState.TakeOff;
+    }
     public void EnabletMovingPlatformConstraint(MovingPlatform movingPlatform)
     {
-
+        movingPlatform.playerController = this;
+        movingPlatform.SpringCharging();
         constraintSource.sourceTransform = movingPlatform.platform;
         constraintSource.weight = 1f;
         parentConstraint.translationAtRest = this.transform.position;
@@ -154,23 +186,21 @@ public class PlayerController : MonoBehaviour
         parentConstraint.enabled = false;
     }
 
-    void TransferEnd()
+    public void LendedOnPlatform()
     {
-        if (isTransferEnd && transferEndframeOffset > 0)
+      /*  if (isTransferEnd && transferEndframeOffset > 0)
         { transferEndframeOffset--; }
         else if (isTransferEnd)
-        {
-            ReconcileTransforms();
+        {*/
+         //   ReconcileTransforms();
             //Debug.Log(movingPlatform);
             if (movingPlatform)
             {
                 EnabletMovingPlatformConstraint(movingPlatform);
-                movingPlatform.playerController = this;
-                movingPlatform.SpringCharging();
             }
-            isTransferEnd = false;
-            transferEndframeOffset = 0;
-        }
+           // isTransferEnd = false;
+           // transferEndframeOffset = 0;
+       // }
     }
 
     public void SpringLaunch(Vector3 lookDirection)
@@ -179,11 +209,10 @@ public class PlayerController : MonoBehaviour
         movingPlatform = null;
         this.lookDirection = lookDirection;
         state = PlayerState.TakeOff;
-        //previousRotationAngle = transform.eulerAngles;
-        //rotationFactor = 0;
         previousPosition = transform.position;
         newPosition = previousPosition + Vector3.up * 1.7f + transform.rotation*Vector3.forward;
         timerTakingOff = 0;
+        takingOffTime = 0.5f;
     }
     void TakingOff()
     {
@@ -191,14 +220,14 @@ public class PlayerController : MonoBehaviour
         {
             timerTakingOff += Time.deltaTime;
             float takeOffFactor = timerTakingOff / takingOffTime * Mathf.PI * 0.5f;
-            float right=0, up, forward=0;
+            float right, up, forward;
 
-            if (previousPosition.x != newPosition.x) 
-            { right = Mathf.Lerp(previousPosition.x, newPosition.x,1-Mathf.Cos(takeOffFactor)); }
-
+            if (previousPosition.x != newPosition.x)
+            { right = Mathf.Lerp(previousPosition.x, newPosition.x, 1 - Mathf.Cos(takeOffFactor)); }
+            else { right = newPosition.x; }
             if (previousPosition.z != newPosition.z)
-            { forward = Mathf.Lerp(previousPosition.z, newPosition.z,1-Mathf.Cos(takeOffFactor)); }
-
+            { forward = Mathf.Lerp(previousPosition.z, newPosition.z, 1 - Mathf.Cos(takeOffFactor)); }
+            else { forward = newPosition.z; }
             up = Mathf.Lerp(previousPosition.y, newPosition.y, Mathf.Sin(takeOffFactor));
 
             transform.position = Vector3.right * right + Vector3.up * up + Vector3.forward * forward;
@@ -239,7 +268,7 @@ public class PlayerController : MonoBehaviour
     public void Restart()
     {
         transform.position = deltaPosition;
-        DefineSnap();
+        DefineSnap(rotationTime);
         transform.rotation = startRotation;
         previousRotationAngle = transform.eulerAngles;
     }

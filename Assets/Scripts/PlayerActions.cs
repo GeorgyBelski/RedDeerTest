@@ -50,10 +50,12 @@ public class PlayerActions : MonoBehaviour
         animator.SetBool("PlatformJump", true);
         playerController.state = PlayerState.Freeze;
     }
-    public void LendingOnSpringboard()
+    
+    public void LandedOnSpringboard()
     {
         animator.SetBool("PlatformJump", false);
-        playerController.isTransferEnd = true;
+        //playerController.isTransferEnd = true;
+        playerController.LendedOnPlatform();
     }
 
     public void SqueezeThroughPipe() 

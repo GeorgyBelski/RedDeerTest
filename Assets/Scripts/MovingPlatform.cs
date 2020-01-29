@@ -8,6 +8,7 @@ public class MovingPlatform : MonoBehaviour
 
     public Transform platform;
     public Vector3 lookDirection = Vector3.up * 180;
+    public float heightOfPlatform = 0.7f;
 
     [Header("References")]
     public Animator animator;
