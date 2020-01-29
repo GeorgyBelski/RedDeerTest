@@ -20,7 +20,7 @@ public class Inventory : MonoBehaviour
 
     void Update()
     {
-        HidingWeapon();
+        //HidingWeapon();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -58,12 +58,14 @@ public class Inventory : MonoBehaviour
     {
         timerHideWeapon = hideWeaponTime;
         isHidingWeapon = true;
+        currentWeapon.animator.SetBool("hide",true );
     }
 
     public void ShowWeapon()
     {
         timerHideWeapon = hideWeaponTime;
         isHidingWeapon = false;
+        currentWeapon.animator.SetBool("hide", false);
     }
 
     void AppearingWeapon()

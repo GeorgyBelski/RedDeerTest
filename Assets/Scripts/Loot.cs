@@ -13,11 +13,12 @@ public class Loot : MonoBehaviour
     public new Collider collider;
     public float pickUpTime = 0.6f;
     float timerPickUpTime = 0;
+    public Animator animator;
 
     Transform hand;
     Vector3 idlePosition;
     Quaternion idleRotation;
-    Vector3 hendPosition;
+    //Vector3 handPosition;
 
     void Start()
     {

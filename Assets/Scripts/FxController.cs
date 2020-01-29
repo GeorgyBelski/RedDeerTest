@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FxController : MonoBehaviour
 {
-    public new ParticleSystem particleSystem;
+    public ParticleSystem particleSystem;
     float timerLifetime;
     public bool isActive = true;
 
