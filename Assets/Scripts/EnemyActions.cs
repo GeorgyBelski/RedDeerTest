@@ -7,6 +7,7 @@ public class EnemyActions : MonoBehaviour
 
     public Animator animator;
     public new Collider collider;
+    public Transform core;
     public GameObject FumePrefab;
     Vector3 startPosition;
     Quaternion startRotarion;
@@ -22,8 +23,9 @@ public class EnemyActions : MonoBehaviour
     }    
     public void EnableEnemy()
     {
-        transform.position = startPosition;
-        transform.rotation = startRotarion;
+       // transform.position = startPosition;
+       // transform.rotation = startRotarion;
+       // animator.SetBool("Death", false);
         gameObject.SetActive(true);
         collider.enabled = true; 
     }
@@ -35,7 +37,7 @@ public class EnemyActions : MonoBehaviour
     public void DisableEnemy() // "Death" Animation call
     {
         gameObject.SetActive(false);
-        animator.SetBool("Death", false);
+      //animator.SetBool("Death", false);
         ApplyDeathFX();
     }
 
@@ -56,7 +58,7 @@ public class EnemyActions : MonoBehaviour
         {
             FxController fume = Instantiate(FumePrefab).GetComponent<FxController>();
             FxManager.fxList.Add(fume);
-            fume.transform.position = transform.position;
+            fume.transform.position = core.transform.position;
             fume.ActivateFx();
         }
     }

@@ -27,7 +27,17 @@ public class Loot : MonoBehaviour
         idleRotation = transform.rotation;
 
     }
-
+    public void Restart() 
+    {
+        if(state == LootState.Idle) 
+        { 
+            animator.SetBool("hide", false);
+            transform.position = idlePosition;
+            transform.rotation = idleRotation;
+            collider.enabled = true;
+            gameObject.layer = Globals.lootLayer;
+        }
+    }
     void Update()
     {
         PickingUp();
@@ -50,6 +60,7 @@ public class Loot : MonoBehaviour
             if (timerPickUpTime >= pickUpTime) 
             {
                 state = LootState.InInventory;
+                timerPickUpTime = 0;
             }
             
         }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerActions : MonoBehaviour
 {
+    public static PlayerActions playerActions;
     public Animator animator;
     public Inventory inventory;
     public PlayerController playerController;
@@ -14,7 +15,7 @@ public class PlayerActions : MonoBehaviour
     
     void Start()
     {
-        
+        playerActions = this;
     }
     void Update()
     {
@@ -44,6 +45,7 @@ public class PlayerActions : MonoBehaviour
     public void Restart()
     {
         playerController.Restart();
+        CameraController.cameraController.Restart();
     }
     public void JumpOnSpringboard()
     {
@@ -59,8 +61,9 @@ public class PlayerActions : MonoBehaviour
         playerController.LendedOnPlatform();
     }
 
-    public void SqueezeThroughPipe() 
+    public void SqueezeThroughPipe(Vector3 destination) 
     {
+        playerController.pipeDestination = destination;
         timerScaleDelay = scaleDelay;
         isPipe = true;
     }
@@ -113,18 +116,23 @@ public class PlayerActions : MonoBehaviour
         }
     }
 
+    public void EndLevel()
+    {
+        inventory.DropWeapon();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.layer == Globals.pipeLayer)
         {
             SqueeezeAttributes squeeezeAttributes = other.GetComponent<SqueeezeAttributes>();
             squeeezeAttributes.EnableNextTriggers();
-            playerController.pipeDestination = squeeezeAttributes.destination;
-            SqueezeThroughPipe();
+            //playerController.pipeDestination = squeeezeAttributes.destination;
+            SqueezeThroughPipe(squeeezeAttributes.destination);
         }
         else if (other.gameObject.layer == Globals.stairLayer) 
         {
-            Debug.Log("other : " + other.gameObject);
+            //Debug.Log("other : " + other.gameObject);
             //other.gameObject.GetComponent<StairController>().DisableCollider();
             Climb();
         }

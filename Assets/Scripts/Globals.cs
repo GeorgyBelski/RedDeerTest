@@ -15,4 +15,5 @@ public class Globals : MonoBehaviour
     public static int springboardLayer = 12;
     public static int pipeLayer = 13;
     public static int stairLayer =14;
+    public static int playerLayer = 15;
 }

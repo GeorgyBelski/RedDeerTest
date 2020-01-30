@@ -33,7 +33,7 @@ public class Inventory : MonoBehaviour
             { 
                 loot.Add(newLoot);
                 if (newLoot.type == Type.Weapon) 
-                {
+                { 
                     newLoot.transform.parent = rightHand;
                     newLoot.PickUp(rightHand);
                     currentWeapon = newLoot;
@@ -68,9 +68,13 @@ public class Inventory : MonoBehaviour
         currentWeapon.animator.SetBool("hide", false);
     }
 
-    void AppearingWeapon()
+    public void DropWeapon()
     {
-        
-
+        if (!currentWeapon) { return; }
+        currentWeapon.transform.parent = null;
+        HideWeapon();
+        currentWeapon.state = LootState.Idle;
+        loot.Remove(currentWeapon);
+        currentWeapon = null;
     }
 }

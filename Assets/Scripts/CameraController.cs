@@ -4,14 +4,20 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    public static CameraController cameraController;
     public float rotationSpeed = 30f;
     public Transform player;
     public float dotProductX, dotProductZ;
+    Quaternion startRotation;
     void Start()
     {
-
+        cameraController = this;
+        startRotation = transform.rotation;
     }
-
+    public void Restart() 
+    {
+        transform.rotation = startRotation;
+    }
     void LateUpdate()
     {
         AutoRotate();
