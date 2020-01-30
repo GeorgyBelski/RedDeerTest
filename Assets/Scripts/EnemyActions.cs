@@ -37,7 +37,6 @@ public class EnemyActions : MonoBehaviour
     public void DisableEnemy() // "Death" Animation call
     {
         gameObject.SetActive(false);
-      //animator.SetBool("Death", false);
         ApplyDeathFX();
     }
 
@@ -45,22 +44,9 @@ public class EnemyActions : MonoBehaviour
 
     void ApplyDeathFX()
     {
-        FxController fxController = null;
-        foreach (FxController fx in FxManager.fxList) 
-        {
-            if (fx.isActive) 
-            {
-                fxController = fx;
-                break;
-            }
-        }
-        if (!fxController) 
-        {
-            FxController fume = Instantiate(FumePrefab).GetComponent<FxController>();
-            FxManager.fxList.Add(fume);
-            fume.transform.position = core.transform.position;
-            fume.ActivateFx();
-        }
+        FxController fxController = FxManager.GetFume();
+        fxController.transform.position = core.transform.position;
+        fxController.ActivateFx();
     }
     private void OnTriggerEnter(Collider other)
     {

@@ -10,6 +10,10 @@ public class FxController : MonoBehaviour
 
     void Start()
     {
+        Restart();
+    }
+    public void Restart() 
+    {
         var maxLifetime = particleSystem.main.startLifetime.constantMax;
         timerLifetime = particleSystem.main.duration + maxLifetime;
     }
@@ -20,6 +24,7 @@ public class FxController : MonoBehaviour
     }
     public void ActivateFx() 
     {
+        Restart();
         isActive = true;
         this.gameObject.SetActive(true);
     }

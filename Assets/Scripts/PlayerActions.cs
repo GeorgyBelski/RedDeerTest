@@ -126,7 +126,6 @@ public class PlayerActions : MonoBehaviour
         if (other.gameObject.layer == Globals.pipeLayer)
         {
             SqueeezeAttributes squeeezeAttributes = other.GetComponent<SqueeezeAttributes>();
-            squeeezeAttributes.EnableNextTriggers();
             //playerController.pipeDestination = squeeezeAttributes.destination;
             SqueezeThroughPipe(squeeezeAttributes.destination);
         }
